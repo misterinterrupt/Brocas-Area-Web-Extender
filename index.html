@@ -1,0 +1,87 @@
+<html>
+<head>
+  <title>Task Master</title>
+  <script type="text/javascript" src="bower_components/notify.js/notify.js"></script>
+</head>
+<body>
+  <div id="askpermissionBtn"><button>Grant Permission</button></div>
+  <div id="task-entry">
+    <input id="task-text"></input>
+    <button id="addTaskBtn">Add Task</button>
+  </div>
+  <div id="task-display">
+    <ul></ul>
+  </div>
+  <script type="text/javascript">
+
+
+
+
+
+  var taskList = [],
+      activeTaskMsg = "Hey, get to work on this: ",
+      noTasksMsg = "There are no tasks in the queue.",
+      askpermissionBtn = document.getElementById("askpermissionBtn"),
+      addTaskBtn = document.getElementById("addTaskBtn"),
+      
+      initTaskList = function initTaskList() {
+        
+        var storedTaskList = localStorage.getItem("tasklist");
+        if(storedTaskList) {
+          taskList = JSON.parse(storedTaskList);
+        }
+      },
+
+      removeTask = function removeTask(taskText) {
+        taskList.pop();
+        localStorage.setItem("tasklist", JSON.stringify(taskList));
+        setTimeout(prod, 3000);
+        return;
+      },
+
+      storeTask = function storeTask(taskText) {
+        
+        taskList.push(taskText);
+        localStorage.setItem("tasklist", JSON.stringify(taskList));
+      },
+      
+      onNotifyClose = function onNotifyClose(taskText) {
+        removeTask(taskText);
+      },
+      
+      onNotifyClick = function onNotifyClick(taskText) {
+        // nothing to do here, just keep prodding...
+        setTimeout(prod, 120000);
+      },
+      
+      addTask = function addTask(ev) {
+        
+        var taskText = document.getElementById("task-text").value;
+        storeTask(taskText);
+      },
+      prod = function prod() {
+
+        var topPriority = taskList[taskList.length - 1];
+        (new Notify( (topPriority ? activeTaskMsg : noTasksMsg), {
+          body: (topPriority? topPriority : "Nothing to do I guess..."),
+          notifyClose: (function() { onNotifyClose(topPriority); }),
+          notifyClick: (function() { onNotifyClick(topPriority); })
+        })).show();
+      };
+
+
+  /* begin */
+  initTaskList();
+  askpermissionBtn.addEventListener("click", function askpermission() {
+    Notify.requestPermission();
+  });
+
+  addTaskBtn.addEventListener("click", addTask);
+
+  setTimeout(prod, 3000);
+
+
+  </script>
+</body>
+
+</html>
