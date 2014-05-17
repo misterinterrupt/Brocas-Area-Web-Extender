@@ -8,6 +8,7 @@
   <div id="task-entry">
     <input id="task-text"></input>
     <button id="addTaskBtn">Add Task</button>
+    <button id="remTaskBtn">Remove Task</button>
   </div>
   <div id="task-display">
     <ul></ul>
@@ -23,6 +24,7 @@
       noTasksMsg = "There are no tasks in the queue.",
       askpermissionBtn = document.getElementById("askpermissionBtn"),
       addTaskBtn = document.getElementById("addTaskBtn"),
+      remTaskBtn = document.getElementById("remTaskBtn"),
       
       initTaskList = function initTaskList() {
         
@@ -33,9 +35,10 @@
       },
 
       removeTask = function removeTask(taskText) {
-        taskList.pop();
+        taskList.shift();
         localStorage.setItem("tasklist", JSON.stringify(taskList));
         setTimeout(prod, 3000);
+        showTasks();
         return;
       },
 
@@ -43,6 +46,23 @@
         
         taskList.push(taskText);
         localStorage.setItem("tasklist", JSON.stringify(taskList));
+        showTasks();
+      },
+      
+      showTasks = function showTasks() {
+        var list = "",
+            frag = document.createDocumentFragment();
+
+        for (var i=0; i<taskList.length; i++) {
+          var li = document.createElement('li');
+          li.textContent = taskList[i];
+          frag.appendChild(li);
+        }
+        var display = document.getElementById('task-display');
+        while(display.lastChild) {
+          display.removeChild(display.lastChild);
+        }
+        display.appendChild(frag);
       },
       
       onNotifyClose = function onNotifyClose(taskText) {
@@ -77,7 +97,7 @@
   });
 
   addTaskBtn.addEventListener("click", addTask);
-
+  remTaskBtn.addEventListener("click", removeTask);
   setTimeout(prod, 3000);
 
 
